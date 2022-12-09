@@ -1,0 +1,7 @@
+oracle.user = oracle
+oracle.pass = 1234
+mysql.user = 한글
+mysql.pass = 1234
+
+
+secret.number = 5600

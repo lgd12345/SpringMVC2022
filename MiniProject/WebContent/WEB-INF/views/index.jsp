@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<c:set var='root' value="${pageContext.request.contextPath }/" />
 <!DOCTYPE html>
 <html>
 <head>
@@ -64,7 +65,8 @@
 							</tbody>
 						</table>
 
-						<a href="${root}board/main" class="btn btn-primary">더보기</a>
+						<a href="${root}board/main?board_info_idx=1"
+							class="btn btn-primary">더보기</a>
 					</div>
 				</div>
 			</div>
@@ -109,7 +111,7 @@
 							</tbody>
 						</table>
 
-						<a href="${root}board/main" class="btn btn-primary">더보기</a>
+						<a href="${root}board/main?board_info_idx=2" class="btn btn-primary">더보기</a>
 					</div>
 				</div>
 			</div>
@@ -154,7 +156,7 @@
 							</tbody>
 						</table>
 
-						<a href="${root}board/main" class="btn btn-primary">더보기</a>
+						<a href="${root}board/main?board_info_idx=3" class="btn btn-primary">더보기</a>
 					</div>
 				</div>
 			</div>
@@ -199,7 +201,7 @@
 							</tbody>
 						</table>
 
-						<a href="${root}board/main" class="btn btn-primary">더보기</a>
+						<a href="${root}board/main?board_info_idx=4" class="btn btn-primary">더보기</a>
 					</div>
 				</div>
 			</div>

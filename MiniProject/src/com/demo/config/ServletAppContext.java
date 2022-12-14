@@ -1,5 +1,7 @@
 package com.demo.config;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -17,6 +19,8 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.demo.beans.LoginUserBean;
+import com.demo.interceptor.CheckLoginInterceptor;
 import com.demo.interceptor.MenuInterceptor;
 import com.demo.mapper.BoardMapper;
 import com.demo.mapper.MenuMapper;
@@ -30,6 +34,7 @@ import com.demo.service.MenuService;
 //스캔할 패키지를 지정한다.
 @ComponentScan("com.demo.controller")
 @ComponentScan("com.demo.service")
+@ComponentScan("com.demo.beans")
 @PropertySource("/WEB-INF/properties/db.properties")
 public class ServletAppContext implements WebMvcConfigurer {
 
@@ -49,6 +54,10 @@ public class ServletAppContext implements WebMvcConfigurer {
 	// 오토와이어드
 	@Autowired
 	private MenuService menuService;
+
+	// 로그인(세션) 정보 들어있는 객체 주입받아서 인터셉터의 생성자에 주입하기
+	@Resource(name = "loginUserBean")
+	private LoginUserBean loginUserBean;
 
 	// Controller의 메서드가 반환하는 jsp의 이름 앞뒤에 경로와 확장자를 붙혀주도록 설정한다.
 	@Override
@@ -111,9 +120,10 @@ public class ServletAppContext implements WebMvcConfigurer {
 		factoryBean.setSqlSessionFactory(factory);
 		return factoryBean;
 	}
+
 	// 쿼리문 실행을 위한 객체(UserMapper)
 	@Bean
-	public MapperFactoryBean<UserMapper> getUserMapper(SqlSessionFactory factory) throws Exception{
+	public MapperFactoryBean<UserMapper> getUserMapper(SqlSessionFactory factory) throws Exception {
 		MapperFactoryBean<UserMapper> factoryBean = new MapperFactoryBean<UserMapper>(UserMapper.class);
 		factoryBean.setSqlSessionFactory(factory);
 		return factoryBean;
@@ -123,9 +133,18 @@ public class ServletAppContext implements WebMvcConfigurer {
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		WebMvcConfigurer.super.addInterceptors(registry);
-		MenuInterceptor menuInterceptor = new MenuInterceptor(menuService);
+		// Menu 인터셉터 등록
+		MenuInterceptor menuInterceptor = new MenuInterceptor(menuService, loginUserBean);
 		InterceptorRegistration reg1 = registry.addInterceptor(menuInterceptor);
-		reg1.addPathPatterns("/**"); // 모든요청에 적용됨
+		// CheckLogin 인터셉터 등록
+		CheckLoginInterceptor checkLoginInterceptor = new CheckLoginInterceptor(loginUserBean);
+		InterceptorRegistration reg2 = registry.addInterceptor(checkLoginInterceptor);
+
+		reg1.addPathPatterns("/**"); // 모든 요청에 적용됨
+		// 회원정보수정, 로그아웃, 보드관련기능에 적용됨
+		reg2.addPathPatterns("/user/modify", "/user/logout", "/board/*");
+		//보드 메인에는 등록하지 않는다.(로그인 안해도 입장가능)
+		reg2.excludePathPatterns("/board/main");
 	}
 
 }

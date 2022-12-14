@@ -16,7 +16,7 @@ public class LoginUserBean {
 	private String user_name;
 
 	// 유효성 검사 해야하는 것
-	@Size(min = 4, max = 10, message = "비밀번호는 4-20자 이어야 합니다.")
+	@Size(min = 4, max = 10, message = "비밀번호는 4-10자 이어야 합니다.")
 	@Pattern(regexp = "[a-zA-z0-9]*", message = "비밀번호는 영문과 숫자만 가능합니다.")
 	private String user_id;
 

@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import com.demo.beans.BoardInfoBean;
+import com.demo.beans.LoginUserBean;
 import com.demo.service.MenuService;
 
 // 상단메뉴 처리할 인터셉터
@@ -17,9 +18,12 @@ public class MenuInterceptor implements HandlerInterceptor {
 	// 오토와이어드(필드주입)하면 되는데 이번엔 생성자로 주입할 것임.
 	private MenuService menuService;
 
+	private LoginUserBean loginUserBean;
+
 	// (생성자 주입) 인터셉터가 생성될 때(주입됨)
-	public MenuInterceptor(MenuService menuService) {
+	public MenuInterceptor(MenuService menuService, LoginUserBean loginUserBean) {
 		this.menuService = menuService;
+		this.loginUserBean = loginUserBean;
 	}
 
 	// 리턴 ture 일때 요청을 그대로 실행한다.
@@ -30,6 +34,7 @@ public class MenuInterceptor implements HandlerInterceptor {
 		List<BoardInfoBean> topMenuList = menuService.getMenuList();
 		// request로 topMenuList에 저장함
 		request.setAttribute("topMenuList", topMenuList);
+		request.setAttribute("loginUserBean", loginUserBean);
 		return true;
 	}
 }

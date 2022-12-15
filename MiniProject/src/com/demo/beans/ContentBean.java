@@ -1,8 +1,8 @@
 package com.demo.beans;
 
-import java.util.Date;
-
 import javax.validation.constraints.NotBlank;
+
+import org.springframework.web.multipart.MultipartFile;
 
 public class ContentBean {
 
@@ -18,12 +18,34 @@ public class ContentBean {
 	@NotBlank(message = "내용을 입력해주세요")
 	private String content_text;
 
-	private String content_file;
-	private int content_writer_idx;
 	private int content_board_idx;
-	private Date content_date;
+	private String content_date;
+
+	private String content_file; // 파일이름이 들어감 문자열 변수
+
+	private MultipartFile upload_file; // 업로드 한 파일을 담을 객체 추가하기
+
+	private int content_writer_idx;
+
+	private String content_writer_name; // 글쓴이 이름 추가
 
 	// 겟셋
+	public String getContent_writer_name() {
+		return content_writer_name;
+	}
+
+	public void setContent_writer_name(String content_writer_name) {
+		this.content_writer_name = content_writer_name;
+	}
+
+	public MultipartFile getUpload_file() {
+		return upload_file;
+	}
+
+	public void setUpload_file(MultipartFile upload_file) {
+		this.upload_file = upload_file;
+	}
+
 	public int getContent_idx() {
 		return content_idx;
 	}
@@ -72,11 +94,11 @@ public class ContentBean {
 		this.content_board_idx = content_board_idx;
 	}
 
-	public Date getContent_date() {
+	public String getContent_date() {
 		return content_date;
 	}
 
-	public void setContent_date(Date content_date) {
+	public void setContent_date(String content_date) {
 		this.content_date = content_date;
 	}
 

@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -143,8 +144,14 @@ public class ServletAppContext implements WebMvcConfigurer {
 		reg1.addPathPatterns("/**"); // 모든 요청에 적용됨
 		// 회원정보수정, 로그아웃, 보드관련기능에 적용됨
 		reg2.addPathPatterns("/user/modify", "/user/logout", "/board/*");
-		//보드 메인에는 등록하지 않는다.(로그인 안해도 입장가능)
+		// 보드 메인에는 등록하지 않는다.(로그인 안해도 입장가능)
 		reg2.excludePathPatterns("/board/main");
+	}
+
+	// StandardServletMultipartResolve 빈 등록
+	@Bean
+	public StandardServletMultipartResolver multipartResolver() {
+		return new StandardServletMultipartResolver();
 	}
 
 }

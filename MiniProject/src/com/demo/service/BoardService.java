@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -27,6 +28,12 @@ public class BoardService {
 
 	@Value("${path.upload}")
 	private String path_upload;
+
+	@Value("${page.listcnt}")
+	private int page_listcnt;
+
+	@Value("${page.paginationcnt}")
+	private int page_paginationcnt;
 
 	// 서버로 업로드 된 파일을 업로드 폴더에 저장하고 파일의 이름을 리턴하는 메소드
 	private String saveUploadFile(MultipartFile upload_file) {
@@ -66,16 +73,56 @@ public class BoardService {
 		boardMapper.addContentInfo(writeContentBean);
 	}
 
+	// 게시판 제목 가져오기
 	public String getBoardInfoName(int board_info_idx) {
 		return boardMapper.getBoardInfoName(board_info_idx);
 	}
 
-	public List<ContentBean> getContentList(int board_info_idx) {
-		return boardMapper.getContentList(board_info_idx);
+	// 게시글 리스트 (페이지 추가하여 페이지에 해당하는 글을 가져오게 한다.)
+	public List<ContentBean> getContentList(int board_info_idx, int page) {
+		// 시작인덱스 = ( 페이지번호 -1 ) * 10
+		int start = (page - 1) * page_listcnt;
+		// 마이바티스의 RowBounds 클래스를 사용해 가져올 글 시작 번호, 가져올 갯수로 설정
+		RowBounds rowBounds = new RowBounds(start, page_listcnt);
+		// 매퍼에서 처리하도록 rowBounds 객체를 매개변수로 추가한다.
+		return boardMapper.getContentList(board_info_idx, rowBounds);
 	}
 
 	// 글 상세보기
 	public ContentBean getContentInfo(int content_idx) {
 		return boardMapper.getContentInfo(content_idx);
+	}
+
+	// 글 수정하기 들어가기
+	// 글 인덱스 번호로 검색해서 글 정보를 modifyContentBean 입력한다.
+	public void getContents(ContentBean modifyContentBean) {
+
+		ContentBean temp = boardMapper.getContentInfo(modifyContentBean.getContent_idx());
+
+		modifyContentBean.setContent_writer_name(temp.getContent_writer_name());
+		modifyContentBean.setContent_date(temp.getContent_date());
+		modifyContentBean.setContent_subject(temp.getContent_subject());
+		modifyContentBean.setContent_text(temp.getContent_text());
+		modifyContentBean.setContent_file(temp.getContent_file());
+	}
+
+	// 글 수정하기
+	public void modifyContentInfo(ContentBean modifyContentBean) {
+
+		MultipartFile upload_file = modifyContentBean.getUpload_file();
+
+		// 새로 이미지를 업로드 했으면 그 이미지 이름으로 수정한다.
+		if (upload_file.getSize() > 0) {
+
+			String file_name = saveUploadFile(upload_file);
+			modifyContentBean.setContent_file(file_name);
+		}
+
+		boardMapper.modifyContentInfo(modifyContentBean);
+	}
+
+	// 글 삭제하기
+	public void deleteContentInfo(int content_idx) {
+		boardMapper.deleteContentInfo(content_idx);
 	}
 }

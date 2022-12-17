@@ -22,10 +22,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.demo.beans.LoginUserBean;
 import com.demo.interceptor.CheckLoginInterceptor;
+import com.demo.interceptor.CheckWriterInterceptor;
 import com.demo.interceptor.MenuInterceptor;
 import com.demo.mapper.BoardMapper;
 import com.demo.mapper.MenuMapper;
 import com.demo.mapper.UserMapper;
+import com.demo.service.BoardService;
 import com.demo.service.MenuService;
 
 //Spring MVC 관련된 설정을 하는 클래스
@@ -55,6 +57,9 @@ public class ServletAppContext implements WebMvcConfigurer {
 	// 오토와이어드
 	@Autowired
 	private MenuService menuService;
+	
+	@Autowired
+	private BoardService boardService;
 
 	// 로그인(세션) 정보 들어있는 객체 주입받아서 인터셉터의 생성자에 주입하기
 	@Resource(name = "loginUserBean")
@@ -74,17 +79,6 @@ public class ServletAppContext implements WebMvcConfigurer {
 		registry.addResourceHandler("/**").addResourceLocations("/resources/");
 	}
 
-	// Properties 파일을 Message로 등록한다. Message를 jsp파일에서도 확인 할 수 있다.
-	// 빈으로 등록했다.
-	/*
-	 * @Bean public ReloadableResourceBundleMessageSource messageSource() {
-	 * 
-	 * ReloadableResourceBundleMessageSource messageSource = new
-	 * ReloadableResourceBundleMessageSource(); //
-	 * res.setBasename("/WEB-INF/properties/db.properties");
-	 * messageSource.setBasenames("/WEB-INF/properties/db.properties");
-	 * messageSource.setDefaultEncoding("UTF-8"); return messageSource; }
-	 */
 	// 데이터베이스 (접속 정보 관리)객체
 	@Bean
 	public BasicDataSource dataSource() {
@@ -140,12 +134,17 @@ public class ServletAppContext implements WebMvcConfigurer {
 		// CheckLogin 인터셉터 등록
 		CheckLoginInterceptor checkLoginInterceptor = new CheckLoginInterceptor(loginUserBean);
 		InterceptorRegistration reg2 = registry.addInterceptor(checkLoginInterceptor);
-
+		// CheckWriter 인터셉터 등록
+		CheckWriterInterceptor checkWriterInterceptor = new CheckWriterInterceptor(loginUserBean, boardService);
+		InterceptorRegistration reg3 = registry.addInterceptor(checkWriterInterceptor);
+		
 		reg1.addPathPatterns("/**"); // 모든 요청에 적용됨
 		// 회원정보수정, 로그아웃, 보드관련기능에 적용됨
 		reg2.addPathPatterns("/user/modify", "/user/logout", "/board/*");
 		// 보드 메인에는 등록하지 않는다.(로그인 안해도 입장가능)
 		reg2.excludePathPatterns("/board/main");
+		// 글쓴 사람이 아닐 때 수정 삭제 제한
+		reg3.addPathPatterns("/board/modify","/board/delete");
 	}
 
 	// StandardServletMultipartResolve 빈 등록

@@ -5,4 +5,6 @@
 <script>
 	alert('저장 되었습니다')
 	location.href = '${root }board/main?board_info_idx=${writeContentBean.content_board_idx}'
+	/* location.href = '${root}board/read?board_info_idx=${writeContentBean.content_board_idx}&content_idx=${writeContentBean.content_idx}' */
+	/* 글쓰고 바로 글 보기 */
 </script>

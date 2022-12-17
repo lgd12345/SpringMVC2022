@@ -6,7 +6,8 @@ import javax.validation.constraints.Size;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
 
-// 객체를 loginUserBean라는 이름으로 세션에 등록한다.
+// 객체를 loginUserBean라는 이름으로 세션에 등록한다.(이름으로 만들어서 주입할 때 이름을 사용하는 게 더 좋을 수 있음)
+// 객체가 하나밖에 없을 때 주입시 보통 이름으로 주입한다. 지금은 같은 객체가 하나지만 위에 이유로 사용했음
 @Component("loginUserBean")
 @SessionScope
 public class LoginUserBean {

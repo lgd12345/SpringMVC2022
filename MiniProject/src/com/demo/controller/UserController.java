@@ -24,6 +24,7 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 
+// 빈의 이름을 이용해서 주입할 객체 검색
 	@Resource(name = "loginUserBean")
 	private LoginUserBean loginUserBean;
 

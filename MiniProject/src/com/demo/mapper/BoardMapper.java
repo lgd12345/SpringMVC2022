@@ -43,6 +43,7 @@ public interface BoardMapper {
 	String getBoardInfoName(int board_info_idx);
 
 	// to_char를 써서 문자열로 변환시켰기 때문에 빈에서 등록시 Date가 아닌 String으로 해줘야한다.
+	// rowBounds 마이바티스에서 해줘서 편함
 
 	@Select("select  t1.content_idx, t1.content_subject, t2.user_name as content_writer_name, "
 			+ "to_char(t1.content_date, 'YYYY-MM-DD') as content_date " + "from content_table t1 JOIN user_table t2 "
@@ -50,6 +51,10 @@ public interface BoardMapper {
 			+ "and t1.content_board_idx = #{board_info_idx} order by t1.content_idx desc")
 	List<ContentBean> getContentList(int board_info_idx, RowBounds rowBounds);
 
+	// 전체 글 갯수 읽어오기
+	@Select("select count(*) from content_table where content_board_idx = #{content_board_idx}")
+	int getContentCnt(int content_board_idx);
+	
 // 글 상세 목록
 // 원래 글쓴이 정보 안 가져왔는데 t1.content_writer_idx정보 추가로 넣어서 정보 가져온다.
 // 이걸로 글쓴정보와 세션의 로그인유저빈 정보를 비교해서 나중에 사용할 것임

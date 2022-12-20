@@ -16,7 +16,7 @@ public class HomeController {
 		// System.out.println("home");
 		// 실제 서버가 구동되는 위치(주소) 확인해서 파일 담을 위치 정하기 위함
 		System.out.println("실제 서버 구동 위치 확인용" + request.getServletContext().getRealPath("/"));
-		return "index";
+		return "redirect:/main";
 	}
 
 }

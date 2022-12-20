@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.demo.beans.ContentBean;
 import com.demo.beans.LoginUserBean;
+import com.demo.beans.PageBean;
 import com.demo.mapper.BoardMapper;
 
 @Service
@@ -86,6 +87,17 @@ public class BoardService {
 		RowBounds rowBounds = new RowBounds(start, page_listcnt);
 		// 매퍼에서 처리하도록 rowBounds 객체를 매개변수로 추가한다.
 		return boardMapper.getContentList(board_info_idx, rowBounds);
+	}
+
+	// 페이지네이션
+	
+	public PageBean getContentCnt(int content_board_idx, int currentPage) {
+		// 전체 게시글 갯수 읽어오기
+		int content_cnt = boardMapper.getContentCnt(content_board_idx);
+
+		PageBean pageBean = new PageBean(content_cnt, currentPage, page_listcnt, page_paginationcnt);
+
+		return pageBean;
 	}
 
 	// 글 상세보기

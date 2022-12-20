@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.demo.beans.ContentBean;
 import com.demo.beans.LoginUserBean;
+import com.demo.beans.PageBean;
 import com.demo.service.BoardService;
 
 @Controller
@@ -44,19 +45,29 @@ public class BoardController {
 		// 게시글 리스트를 가져올 때 page를 매개변수로 입력한다.
 		List<ContentBean> contentList = boardService.getContentList(board_info_idx, page);
 		model.addAttribute("contentList", contentList);
+		// (게시판 정보 번호 , 현재 페이지)
+		PageBean pageBean = boardService.getContentCnt(board_info_idx, page);
+		model.addAttribute("pageBean",pageBean);
+		// 현재 페이지 기억하기
+		model.addAttribute("page", page);
 
 		return "board/main";
 	}
 
 	// 상세 글 읽기
+	// @RequestParam(value = "page", defaultValue = "1") int page
+	// value 값이 없으면 처음 들어갈 때 defaultValue = "1" 이게 없으면 에러난다.
+	// 하지만 밑에 페이지 기억하고 유지되게 하는 곳에서는 페이지번호가 필수로 들어가기 때문에 필요가 없다.
 	@GetMapping("/read")
 	public String read(@RequestParam("board_info_idx") int board_info_idx, @RequestParam("content_idx") int content_idx,
-			Model model) {
+			 @RequestParam(value = "page", defaultValue = "1") int page, Model model) {
 		// 게시판 이름 정보
 		model.addAttribute("board_info_idx", board_info_idx);
 		// 글 번호와 유저 정보
 		model.addAttribute("content_idx", content_idx);
 		model.addAttribute("loginUserBean", loginUserBean);
+		//페이지 기억하기
+		model.addAttribute("page", page);
 
 		// 글 번호로 DB에서 게시글 내용 읽어오기
 		ContentBean readContentBean = boardService.getContentInfo(content_idx);
@@ -97,10 +108,13 @@ public class BoardController {
 	@GetMapping("/modify")
 	public String modify(@RequestParam("board_info_idx") int board_info_idx,
 			@RequestParam("content_idx") int content_idx, Model model,
-			@ModelAttribute("modifyContentBean") ContentBean modifyContentBean) {
+			@ModelAttribute("modifyContentBean") ContentBean modifyContentBean,
+			@RequestParam("page") int page) {
 
 		modifyContentBean.setContent_board_idx(board_info_idx);
 		modifyContentBean.setContent_idx(content_idx);
+		//페이지
+		model.addAttribute("page", page);
 
 		boardService.getContents(modifyContentBean);
 		model.addAttribute("modifyContentBean", modifyContentBean);
@@ -111,8 +125,10 @@ public class BoardController {
 // 글 수정하기 유효성검사 실시
 	@PostMapping("/modify_pro")
 	public String modify_pro(@Valid @ModelAttribute("modifyContentBean") ContentBean modifyContentBean,
-			BindingResult result) {
-
+			BindingResult result,@RequestParam("page") int page, Model model) {
+		//수정페이지에서도 수정취소할때와 수정할 때 페이지 기억하기
+		model.addAttribute("page", page);
+		
 		if (result.hasErrors()) {
 			return "board/modify";
 		}
